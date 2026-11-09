@@ -74,7 +74,9 @@ Dans le cas où modéliser ce champs ne serait pas juste physiquement, on peut t
 
 ### Création d'un GitHub repository pour stockage de matériel + traçage des différentes versions de codes et du projet
 
-
-
+Création du repository sur GitHub avec un README.md et un .gitignore pour ne pas partager les fichier .pdf.
 
 ## 09-11-2026 : Séance 2
+
+### --- Premier programme : Résolution d'une équation de diffusion ---
+
