@@ -80,3 +80,52 @@ Création du repository sur GitHub avec un README.md et un .gitignore pour ne pa
 
 ### --- Premier programme : Résolution d'une équation de diffusion ---
 
+#### Par methode d'Euler 
+
+On décompose les dérivées suivant un développement limité d'Euler : 
+
+$$\partial_t\rho = \frac{\rho(t+\Delta t) - \rho(t)}{\Delta t}$$
+
+$$\partial_x^2\rho = \frac{\rho(x+\Delta x) + \rho(x-\Delta x) - 2\rho(x)}{\Delta x^2}$$
+
+Ces relations on été prouvées sur papier. 
+
+On créer le Jupyter Notebook Difusion.ipynb pour résoudre les problèmes à une dimension, puis à deux dimensions.
+
+### --- Discussion avec C. Deroulers + L. Gomez ---
+
+Une méthode plus précise a été mis en place pour la prédiction des trajectoires des bactéries. En effet, il a été posé la question de savoir comment on calcule l'accélération de la bactérie. Pour cela, on dois avoir accés à la somme des forces (PFD), elle même découlant d'un gradient de potentiel. Ce potentiel est directement déduit des formules d'énergies issues du papier de Shimaya *et al*. 
+
+$$U \approx [EPS] \times k_b T \times V_{eff}$$
+
+Avec le volume effectif $V_{eff}$ qui corresponds au volume de fluide déplacé dans l'espace entre deux bactéries. 
+
+Cette énergie corresponds à une énergie de dépletion. $V_{eff}$ dépends du mode de contact entre les bactéries et surtout de la taille des particules déplétives (ici les EPS). Ainsi, on estime un rayon de gyration $R_g$ qui correponds au rayon des EPS qui, si collé avec la bactérie, ne permet de déterminer la distance minimale $d_{min}$ pour laquelle les deux bactéries n'ont aucune particules d'EPS autours d'elles. 
+
+Ainsi, $R_g$ sera vu comme un paramètre à modifier. Le volume $V_{eff}$ peut aussi être déterminé numériquement (par somme de pixel contenu dans les deux zones de dépletions de bactéries). 
+
+#### Dans le cadre d'une approche de type "Champs de potentiel"
+
+Il faut comprendre que les champs trouvé et les énergies calculées pour chacune des N bactéries devront être sommés. Après avoir été sommé, on pourra connaitre le champs total de potentiel qui, lors de la détermination des forces agissant sur la bactérie $i$ sera le gradient de ce champs (moins le champs de la bactérie $i$). On se retrouve donc avec N fonctions de deux variables. 
+
+Une autre approche serait de calculer un champs total prenant en compte toutes les interractions entre les bactéries. On aurais donc une fonction $f(x,y,x_i,y_i)_{i \in[0,N]}$ donc une fonction à 2(N+1) variables.
+
+#### Idée : Calculer en boucle les interractions entres bactéries seulement, sans passer par un champs
+
+On pourrait se passer de l'information du champs en tous points (x,y) pour se concentrer seulement sur les interractions entres bactéries. Pour cela, en boucle, on estime $U$ entre deux bactéries et on en déduit son vecteur de déplacement suivant la direction entre les deux bactéries. Cette approche peut-être une bonne idée, notamment pour comprendre des comportements asymptotiques ($[EPS]=1$ uniformément) et dans lexécution du code. En effet, on peut restraindre le calcul de $U$ seulement aux bactéries qui ont un volume effectif (la distance entre deux bactérie est inférieure à une fonction de $d$ et $R_g$). 
+
+#### Dans tous les cas pour $[EPS]=1$ uniformément :
+
+On peut esquisser la forme de l'énergie de dépletion entre deux bactéries suivant leur distance. Ainsi, c'est une fonction "symétrique" qui a une énergie nulle dans le cas du recouvrement des deux bactéries mais qui a un minimum au volume de recouvrement maximal. Elle décroit très rapidement à zéro. 
+
+---
+**FIN DE SEANCE**
+---
+## Interséance 2
+
+### --- Idée : Calculer numériquement les valeurs de $V_{eff}$ pour toutes les positions autours d'une bactérie et pour toute les orientations possibles (dans le cadre d'un problème non symétrique) ---
+
+Il faudrait faire cette simulation sur un grille de taille $N \times N$ sur laquell, on place une bactérie en son centre. Enfin, on fait tourner un algorithme qui calcule $V_eff$ pour toutes les positions d'une certaine bactérie virtuelle.
+
+Ce résultat donnera un tableau de taille $N \times N \times D$ ($D$ pour chaque angles d'orientation entre les deux bactéries) qui sera un calcul du volume effectif que l'on pourra utiliser tel quel dans le modèle. Ces calculs seront "préalables" afin que la simulation des pairs d'interractions ou du champs soient plus rapides et moins coûteux. 
+
